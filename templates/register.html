@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create a TrainingTrack account">
+  <title>Create account — TrainingTrack</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-visual">
+      <div>
+        <div class="brand"><span class="brand-mark" style="background:#fff;color:#111827;">TT</span><span><strong>TrainingTrack</strong><small style="color:rgba(255,255,255,.58);">Focused work. Visible progress.</small></span></div>
+        <div class="eyebrow" style="color:#aeb4ff;margin-top:44px;">GET STARTED</div>
+        <h2>A simple workspace for real work.</h2>
+        <p>Create an account and start managing tasks with the same focused board used in the app demo.</p>
+      </div>
+      <div class="auth-feature-list">
+        <div class="auth-feature"><span>1</span><div>Create your account</div></div>
+        <div class="auth-feature"><span>2</span><div>Add and organize tasks</div></div>
+        <div class="auth-feature"><span>3</span><div>Track progress to completion</div></div>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <div class="auth-heading">
+        <div class="eyebrow">CREATE ACCOUNT</div>
+        <h1>Start your workspace</h1>
+        <p>Your tasks are private to your account.</p>
+      </div>
+      {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+      <form class="auth-form" method="post" action="{{ url_for('register_post') }}">
+        <label>Full name<input type="text" name="name" value="{{ name|default('') }}" placeholder="Your name" maxlength="60" autocomplete="name" required></label>
+        <label>Email<input type="email" name="email" value="{{ email|default('') }}" placeholder="you@example.com" maxlength="120" autocomplete="email" required></label>
+        <label>Password<input type="password" name="password" placeholder="At least 6 characters" minlength="6" autocomplete="new-password" required></label>
+        <button class="primary full" type="submit">Create account</button>
+      </form>
+      <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+    </section>
+  </main>
+</body>
+</html>

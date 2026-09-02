@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TrainingTrack — a focused task management workspace for internships and small projects.">
+  <meta name="theme-color" content="#111827">
+  <title>TrainingTrack — Focused work, visible progress</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-shell" id="app">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="TrainingTrack home">
+        <span class="brand-mark">TT</span>
+        <span>
+          <strong>TrainingTrack</strong>
+          <small>Focused work. Visible progress.</small>
+        </span>
+      </a>
+      <div class="top-actions">
+        <span class="workspace-pill"><span class="live-dot"></span> {{ user["name"] }}</span>
+        <button class="icon-btn" id="themeBtn" aria-label="Switch to dark mode" title="Toggle theme">◐</button>
+        <button class="secondary" id="refreshBtn">↻ Refresh</button>
+        <button class="primary" id="addBtn">+ New task</button>
+        <form method="post" action="{{ url_for('logout') }}" class="logout-form"><button class="ghost-btn" type="submit">Log out</button></form>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-copy-block">
+          <div class="eyebrow">WORKSPACE</div>
+          <h1>Plan today.<br><span>Ship with clarity.</span></h1>
+          <p>TrainingTrack turns daily work into a simple, visible workflow — from idea to done.</p>
+        </div>
+        <div class="hero-panel">
+          <div class="hero-panel-top"><span>Workspace health</span><span class="success-label">On track</span></div>
+          <div class="health-bar"><span></span></div>
+          <div class="health-meta"><span>Tasks stay organized</span><strong id="activeStat">0 active</strong></div>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Workspace statistics">
+        <article class="stat-card"><span class="stat-label">Total tasks</span><strong id="totalCount">0</strong><small>Across this workspace</small></article>
+        <article class="stat-card"><span class="stat-label">Completed</span><strong id="doneStat">0</strong><small>Ready to archive</small></article>
+        <article class="stat-card"><span class="stat-label">Active</span><strong id="activeStatDuplicate">0</strong><small>Currently in motion</small></article>
+        <article class="stat-card alert"><span class="stat-label">Overdue</span><strong id="overdueStat">0</strong><small>Need attention</small></article>
+      </section>
+
+      <section class="toolbar panel">
+        <div class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search tasks, notes or categories…" aria-label="Search tasks"><button id="searchBtn" class="search-submit">Search</button></div>
+        <div class="filter-row">
+          <label>Stage<select id="statusFilter"><option>All</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></label>
+          <label>Priority<select id="priorityFilter"><option>All</option><option>High</option><option>Medium</option><option>Low</option></select></label>
+          <label>Category<select id="categoryFilter"><option>All</option></select></label>
+          <label>Sort<select id="sortBy"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="priority">Priority</option><option value="due">Due date</option></select></label>
+        </div>
+      </section>
+
+      <section class="section-heading">
+        <div><span class="eyebrow">MY WORK</span><h2>Task board</h2></div>
+        <button class="ghost-btn" id="clearViewBtn" type="button" onclick="location.reload()">Reset view</button>
+      </section>
+
+      <section class="board" id="taskGrid" aria-live="polite">
+        <article class="board-column"><div class="column-head"><div><span class="column-dot pending-dot"></span><h3>Pending</h3></div><span class="count" id="pendingCount">0</span></div><div class="column-list" id="pendingList"></div></article>
+        <article class="board-column"><div class="column-head"><div><span class="column-dot progress-dot"></span><h3>In Progress</h3></div><span class="count" id="progressCount">0</span></div><div class="column-list" id="progressList"></div></article>
+        <article class="board-column"><div class="column-head"><div><span class="column-dot done-dot"></span><h3>Completed</h3></div><span class="count" id="doneCount">0</span></div><div class="column-list" id="doneList"></div></article>
+      </section>
+
+      <section class="launch-note panel">
+        <div class="launch-note-icon">API</div>
+        <div><strong>Developer-ready foundation</strong><p>Flask REST API + SQLite persistence, validation, filtering, statistics, health checks and a responsive frontend.</p></div>
+        <div class="api-chip"><code>/api/tasks</code><span>JSON</span></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>TrainingTrack</span><span>Built for focused teams &amp; student projects</span><a href="/health">System health</a></footer>
+  </div>
+
+  <div class="modal hidden" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-head"><div><span class="eyebrow">TASK</span><h2 id="modalTitle">Create a new task</h2><p id="modalSubtitle">Add a task to your workspace.</p></div><button class="icon-btn" id="closeBtn" aria-label="Close dialog">×</button></div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <label>Task title<input id="title" required maxlength="80" placeholder="e.g. Connect the dashboard API"></label>
+        <div class="form-row"><label>Category<select id="category"><option>Frontend</option><option>Backend</option><option>JavaScript</option><option>Performance</option><option>Testing</option><option>Documentation</option></select></label><label>Priority<select id="priority"><option>High</option><option>Medium</option><option>Low</option></select></label></div>
+        <div class="form-row"><label>Status<select id="status"><option>Pending</option><option>In Progress</option><option>Completed</option></select></label><label>Due date<input id="dueDate" type="date"></label></div>
+        <label>Notes<textarea id="notes" rows="4" maxlength="500" placeholder="Add context, acceptance criteria or learning notes…"></textarea></label>
+        <div class="modal-actions"><button type="button" class="secondary" id="cancelBtn">Cancel</button><button class="primary" id="saveBtn" type="submit">Save task</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
