@@ -64,7 +64,6 @@ function renderBoard() {
     Completed: $('doneList'),
   };
   Object.values(columns).forEach((node) => { node.innerHTML = ''; });
-
   const sorted = sortTasks(state.tasks);
   const counts = { Pending: 0, 'In Progress': 0, Completed: 0 };
 
@@ -73,30 +72,16 @@ function renderBoard() {
     const card = document.createElement('article');
     card.className = `task-card priority-${task.priority.toLowerCase()}`;
     card.innerHTML = `
-      <div class="task-card-head">
-        <div class="task-labels">
-          <span class="priority-dot" aria-label="${escapeHtml(task.priority)} priority"></span>
-          <span class="category">${escapeHtml(task.category)}</span>
-        </div>
-        <button class="more-btn" aria-label="Task actions" data-action="edit" data-id="${task.id}">•••</button>
-      </div>
-      <h3>${escapeHtml(task.title)}</h3>
-      <p>${escapeHtml(task.notes || 'No notes added yet.')}</p>
-      <div class="task-card-footer">
-        ${dueLabel(task)}
-        <span class="chip ${statusClass(task.status)}">${escapeHtml(task.status)}</span>
-      </div>
-      <div class="task-card-actions">
-        <button class="text-btn" data-action="edit" data-id="${task.id}">Edit</button>
-        <button class="text-btn danger" data-action="delete" data-id="${task.id}">Delete</button>
-      </div>`;
+      <div class="task-card-head"><div class="task-labels"><span class="priority-dot" aria-label="${escapeHtml(task.priority)} priority"></span><span class="category">${escapeHtml(task.category)}</span></div><button class="more-btn" aria-label="Task actions" data-action="edit" data-id="${task.id}">•••</button></div>
+      <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.notes || 'No notes added yet.')}</p>
+      <div class="task-card-footer">${dueLabel(task)}<span class="chip ${statusClass(task.status)}">${escapeHtml(task.status)}</span></div>
+      <div class="task-card-actions"><button class="text-btn" data-action="edit" data-id="${task.id}">Edit</button><button class="text-btn danger" data-action="delete" data-id="${task.id}">Delete</button></div>`;
     columns[task.status].appendChild(card);
   });
 
   $('pendingCount').textContent = counts.Pending;
   $('progressCount').textContent = counts['In Progress'];
   $('doneCount').textContent = counts.Completed;
-
   ['Pending', 'In Progress', 'Completed'].forEach((status) => {
     const list = columns[status];
     if (!list.children.length) list.innerHTML = '<div class="empty-column">No tasks here</div>';
@@ -110,6 +95,12 @@ function renderStats(stats) {
   $('activeStat').textContent = `${active} active`;
   $('activeStatDuplicate').textContent = active;
   $('overdueStat').textContent = stats.overdue;
+
+  const completionRate = stats.total ? Math.round((stats.completed / stats.total) * 100) : 0;
+  $('healthProgress').style.width = `${completionRate}%`;
+  $('healthLabel').textContent = stats.total === 0 ? 'Getting started'
+    : completionRate >= 75 ? 'On track'
+    : completionRate >= 40 ? 'Building momentum' : 'In progress';
 }
 
 function populateCategories(categoriesInput) {
@@ -165,14 +156,8 @@ function closeModal() {
 
 async function saveTask(event) {
   event.preventDefault();
-  const payload = {
-    title: $('title').value.trim(),
-    category: $('category').value,
-    priority: $('priority').value,
-    status: $('status').value,
-    due_date: $('dueDate').value,
-    notes: $('notes').value.trim(),
-  };
+  const payload = { title: $('title').value.trim(), category: $('category').value, priority: $('priority').value,
+    status: $('status').value, due_date: $('dueDate').value, notes: $('notes').value.trim() };
   try {
     $('saveBtn').disabled = true;
     if (state.editingId) {
@@ -193,8 +178,7 @@ async function saveTask(event) {
 
 async function deleteTask(id) {
   const task = state.tasks.find((item) => item.id === id);
-  if (!task) return;
-  if (!confirm(`Delete “${task.title}”?`)) return;
+  if (!task || !confirm(`Delete “${task.title}”?`)) return;
   try {
     await api.remove(id);
     showToast('Task deleted.');
@@ -214,12 +198,8 @@ function handleTaskAction(event) {
 }
 
 function applyFilters() {
-  state.filters = {
-    q: $('search').value.trim(),
-    status: $('statusFilter').value,
-    priority: $('priorityFilter').value,
-    category: $('categoryFilter').value,
-  };
+  state.filters = { q: $('search').value.trim(), status: $('statusFilter').value,
+    priority: $('priorityFilter').value, category: $('categoryFilter').value };
   load();
 }
 

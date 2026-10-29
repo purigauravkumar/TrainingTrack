@@ -35,9 +35,9 @@
           <p>TrainingTrack turns daily work into a simple, visible workflow — from idea to done.</p>
         </div>
         <div class="hero-panel">
-          <div class="hero-panel-top"><span>Workspace health</span><span class="success-label">On track</span></div>
-          <div class="health-bar"><span></span></div>
-          <div class="health-meta"><span>Tasks stay organized</span><strong id="activeStat">0 active</strong></div>
+          <div class="hero-panel-top"><span>Workspace health</span><span class="success-label" id="healthLabel">Getting started</span></div>
+          <div class="health-bar"><span id="healthProgress"></span></div>
+          <div class="health-meta"><span>Completion rate</span><strong id="activeStat">0 active</strong></div>
         </div>
       </section>
 
@@ -85,7 +85,7 @@
       <form id="taskForm">
         <input type="hidden" id="taskId">
         <label>Task title<input id="title" required maxlength="80" placeholder="e.g. Connect the dashboard API"></label>
-        <div class="form-row"><label>Category<select id="category"><option>Frontend</option><option>Backend</option><option>JavaScript</option><option>Performance</option><option>Testing</option><option>Documentation</option></select></label><label>Priority<select id="priority"><option>High</option><option>Medium</option><option>Low</option></select></label></div>
+        <div class="form-row"><label>Category<select id="category"><option>Frontend</option><option>Backend</option><option>JavaScript</option><option>Testing</option><option>Documentation</option><option>Other</option></select></label><label>Priority<select id="priority"><option>High</option><option>Medium</option><option>Low</option></select></label></div>
         <div class="form-row"><label>Status<select id="status"><option>Pending</option><option>In Progress</option><option>Completed</option></select></label><label>Due date<input id="dueDate" type="date"></label></div>
         <label>Notes<textarea id="notes" rows="4" maxlength="500" placeholder="Add context, acceptance criteria or learning notes…"></textarea></label>
         <div class="modal-actions"><button type="button" class="secondary" id="cancelBtn">Cancel</button><button class="primary" id="saveBtn" type="submit">Save task</button></div>
